@@ -145,3 +145,27 @@ body {
   margin-top: 20px;
   font-size: 3em;
 }
+
+.sequence {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid black;
+  font-size: 2em;
+}
+
+.action-buttons {
+  margin-top: 15px;
+  display: flex;
+  gap: 6px;
+}
+
+.round-counter {
+  font-family: "Quicksand", sans-serif;
+  font-size: 2em;
+}
+
+.difficulty-level {
+  font-family: "Quicksand", sans-serif;
+  font-size: 2em;
+  margin-bottom: 10px;
+}

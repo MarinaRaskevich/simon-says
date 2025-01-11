@@ -85,6 +85,7 @@ const createInitialGameScreen = () => {
       updateKeyboard();
     }
   });
+  startButton.addEventListener("click", startGame);
 };
 
 const updateKeyboard = () => {
@@ -98,6 +99,59 @@ const updateKeyboard = () => {
     key.dataset.symbol = symbol;
     keyboard.appendChild(key);
   });
+};
+
+const startGame = () => {
+  const headerSection = document.querySelector(".header");
+  headerSection.innerHTML = "";
+
+  // Game Elements
+  // Create header H1
+  const header = document.createElement("h1");
+  header.classList.add("app__header");
+  header.innerHTML = "Simon Says Game";
+
+  // Create Round counter
+  const roundCounter = document.createElement("div");
+  roundCounter.id = "round-counter";
+  roundCounter.className = "round-counter";
+  roundCounter.textContent = `Round: ${currentRound}`;
+
+  // Create difficulty level indicator
+  const difficultyLevel = document.createElement("div");
+  difficultyLevel.id = "difficulty-level";
+  difficultyLevel.className = "difficulty-level";
+  difficultyLevel.textContent = `Difficulty: ${currentDifficultyLevel}`;
+
+  // Create sequence input
+  const sequenceInput = document.createElement("input");
+  sequenceInput.id = "sequence";
+  sequenceInput.className = "sequence";
+  sequenceInput.readOnly = true;
+
+  // Create repeat button
+  const buttonsContainer = document.createElement("div");
+  buttonsContainer.className = "action-buttons";
+  const repeatButton = document.createElement("button");
+  repeatButton.id = "btn_repeat";
+  repeatButton.className = "btn btn_repeat";
+  repeatButton.textContent = "Repeat the sequence";
+  repeatButton.disabled = false;
+
+  // Create new game button
+  const newGameButton = document.createElement("button");
+  newGameButton.id = "btn_new-game";
+  newGameButton.className = "btn btn_new-game";
+  newGameButton.textContent = "New game";
+
+  // Append elements
+  buttonsContainer.appendChild(repeatButton);
+  buttonsContainer.appendChild(newGameButton);
+  headerSection.appendChild(header);
+  headerSection.appendChild(roundCounter);
+  headerSection.appendChild(difficultyLevel);
+  headerSection.appendChild(sequenceInput);
+  headerSection.appendChild(buttonsContainer);
 };
 
 document.addEventListener("DOMContentLoaded", () => {
