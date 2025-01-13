@@ -169,3 +169,9 @@ body {
   font-size: 2em;
   margin-bottom: 10px;
 }
+
+.highlight {
+  background-color: #f2f2f2;
+  color: black;
+  box-shadow: 0px -6px 10px rgb(255, 255, 255), 0px 4px 15px rgba(0, 0, 0, 0.15);
+}

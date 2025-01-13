@@ -69,10 +69,26 @@ const createInitialGameScreen = () => {
   keyboard.id = "keyboard";
   keyboard.className = "keyboard";
 
+  //Create audio
+  const keySound = document.createElement("audio");
+  keySound.src = "./src/audio/key.mp3";
+  keySound.id = "key-sound";
+
+  const wrongSound = document.createElement("audio");
+  wrongSound.src = "./src/audio/wrong.mp3";
+  wrongSound.id = "wrong-sound";
+
+  const correctSound = document.createElement("audio");
+  correctSound.src = "./src/audio/correct.mp3";
+  correctSound.id = "correct-sound";
+
   // Append elements
   headerSection.appendChild(difficultyLevelsContainer);
   headerSection.appendChild(startButton);
   mainWrapper.appendChild(keyboard);
+  mainWrapper.appendChild(keySound);
+  mainWrapper.appendChild(wrongSound);
+  mainWrapper.appendChild(correctSound);
   updateKeyboard();
 
   // Event Listeners
@@ -152,6 +168,47 @@ const startGame = () => {
   headerSection.appendChild(difficultyLevel);
   headerSection.appendChild(sequenceInput);
   headerSection.appendChild(buttonsContainer);
+
+  startRound();
+};
+
+const generateSequence = (length) => {
+  const symbols = difficultyLevels[currentDifficultyLevel];
+  let sequence = [];
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * symbols.length);
+    sequence.push(symbols[randomIndex]);
+  }
+  return sequence;
+};
+
+const simulateSequence = (sequence) => {
+  const keyboard = document.getElementById("keyboard");
+  let i = 0;
+
+  const interval = setInterval(() => {
+    if (i < sequence.length) {
+      const key = Array.from(keyboard.children).find(
+        (k) => k.dataset.symbol === sequence[i]
+      );
+      if (key) {
+        key.classList.add("highlight");
+        const keySound = document.getElementById("key-sound");
+        keySound.play();
+        setTimeout(() => key.classList.remove("highlight"), 400);
+      }
+      i++;
+    } else {
+      clearInterval(interval);
+    }
+  }, 400);
+};
+
+const startRound = () => {
+  userSequence = [];
+  const sequenceLength = 2 + (currentRound - 1) * 2;
+  gameSequence = generateSequence(sequenceLength);
+  simulateSequence(gameSequence);
 };
 
 document.addEventListener("DOMContentLoaded", () => {
