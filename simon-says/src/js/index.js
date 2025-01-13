@@ -197,6 +197,8 @@ const startGame = () => {
   });
   nextButton.addEventListener("click", () => {
     currentRound++;
+    attempts = 1;
+    message.textContent = "";
     startRound();
     nextButton.classList.add("hidden");
     repeatButton.classList.remove("hidden");
@@ -218,33 +220,42 @@ const generateSequence = (length) => {
   }
   return sequence;
 };
-
-const simulateSequence = (sequence) => {
+const simulateSequence = async (sequence) => {
   const keyboard = document.getElementById("keyboard");
   const newGameButton = document.getElementById("btn_new-game");
   const repeatButton = document.getElementById("btn_repeat");
-  let i = 0;
   isSequencePlaying = true;
 
-  const interval = setInterval(() => {
-    if (i < sequence.length) {
-      const key = Array.from(keyboard.children).find(
-        (k) => k.dataset.symbol === sequence[i]
-      );
-      if (key) {
+  const highlightKey = (key) => {
+    return new Promise((resolve) => {
+      key.classList.remove("highlight");
+
+      setTimeout(() => {
         key.classList.add("highlight");
+
         const keySound = document.getElementById("key-sound");
         keySound.play();
-        setTimeout(() => key.classList.remove("highlight"), 400);
-      }
-      i++;
-    } else {
-      clearInterval(interval);
-      newGameButton.disabled = false;
-      repeatButton.disabled = attempts == 1 ? false : true;
-      isSequencePlaying = false;
+
+        setTimeout(() => {
+          key.classList.remove("highlight");
+          resolve();
+        }, 400);
+      }, 300);
+    });
+  };
+
+  for (const symbol of sequence) {
+    const key = Array.from(keyboard.children).find(
+      (k) => k.dataset.symbol === symbol
+    );
+    if (key) {
+      await highlightKey(key);
     }
-  }, 400);
+  }
+
+  newGameButton.disabled = false;
+  repeatButton.disabled = attempts == 1 ? false : true;
+  isSequencePlaying = false;
 };
 
 const handleKeyPress = (event) => {
@@ -258,9 +269,14 @@ const handleKeyPress = (event) => {
 
 const handleKeyClick = (event) => {
   if (isSequencePlaying) return;
+  const key = event.target;
 
-  if (event.target.classList.contains("key")) {
+  if (key.classList.contains("key")) {
     const symbol = event.target.dataset.symbol;
+    key.classList.add("highlight");
+    const keySound = document.getElementById("key-sound");
+    keySound.play();
+    setTimeout(() => key.classList.remove("highlight"), 400);
     fillInput(symbol);
   }
 };
