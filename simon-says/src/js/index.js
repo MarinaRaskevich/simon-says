@@ -96,6 +96,7 @@ const createInitialGameScreen = () => {
   mainWrapper.appendChild(keySound);
   mainWrapper.appendChild(wrongSound);
   mainWrapper.appendChild(correctSound);
+  mainWrapper.appendChild(winnerSound);
   updateKeyboard();
 
   // Event Listeners
@@ -273,7 +274,7 @@ const handleKeyPress = (event) => {
 
     setTimeout(() => {
       isKeyBeingProcessed = false;
-    }, 200);
+    }, 100);
   }
 };
 
@@ -310,7 +311,6 @@ const fillInput = (symbol) => {
 };
 
 const endGame = (success) => {
-  const repeatButton = document.getElementById("btn_repeat");
   manageMessages(success);
 
   if (success && currentRound < maxRounds) {
@@ -325,7 +325,8 @@ const endGame = (success) => {
   if (success && currentRound == maxRounds) {
     const winnerSound = document.getElementById("winner-sound");
     winnerSound.play();
-    repeatButton.disable = true;
+    const repeatButton = document.getElementById("btn_repeat");
+    repeatButton.disabled = true;
   }
 
   if (!success) {

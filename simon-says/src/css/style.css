@@ -39,9 +39,15 @@ body {
   justify-content: space-between;
 }
 
+.main {
+  width: 100%;
+}
+
 .main__wrapper {
   display: flex;
   justify-content: center;
+  align-items: center;
+  padding: 10px;
 }
 
 .app__header {
@@ -86,7 +92,6 @@ body {
   list-style: none;
   flex-wrap: wrap;
   padding-left: 0;
-  max-width: 960px;
 }
 
 .key {
@@ -148,7 +153,8 @@ body {
 
 .btn_start {
   margin-top: 20px;
-  font-size: 3em;
+  margin-bottom: 5px;
+  font-size: 2em;
 }
 
 .sequence {
@@ -203,4 +209,26 @@ body {
 
 .hidden {
   display: none;
+}
+
+@media screen and (max-width: 564px) {
+  .app__header {
+    font-size: 2em;
+  }
+
+  .key {
+    height: 2em;
+    font-size: 2.5em;
+    width: 2.5em;
+    margin: 0.2em;
+    padding: 0.2em 0 0 0.2em;
+  }
+
+  .main__wrapper {
+    padding: 0px;
+  }
+
+  .btn {
+    font-size: 1em;
+  }
 }
