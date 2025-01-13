@@ -85,6 +85,10 @@ const createInitialGameScreen = () => {
   correctSound.src = "./src/audio/correct.mp3";
   correctSound.id = "correct-sound";
 
+  const winnerSound = document.createElement("audio");
+  winnerSound.src = "./src/audio/winner.mp3";
+  winnerSound.id = "winner-sound";
+
   // Append elements
   headerSection.appendChild(difficultyLevelsContainer);
   headerSection.appendChild(startButton);
@@ -269,7 +273,7 @@ const handleKeyPress = (event) => {
 
     setTimeout(() => {
       isKeyBeingProcessed = false;
-    }, 400);
+    }, 200);
   }
 };
 
@@ -316,6 +320,12 @@ const endGame = (success) => {
     const nextButton = document.getElementById("btn_next");
     repeatButton.classList.add("hidden");
     nextButton.classList.remove("hidden");
+  }
+
+  if (success && currentRound == maxRounds) {
+    const winnerSound = document.getElementById("winner-sound");
+    winnerSound.play();
+    repeatButton.disable = true;
   }
 
   if (!success) {
