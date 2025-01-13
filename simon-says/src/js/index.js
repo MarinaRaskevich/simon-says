@@ -1,5 +1,6 @@
 // Start data
 let currentDifficultyLevel = "Easy";
+let isSequencePlaying = false;
 let currentRound = 1;
 let gameSequence = [];
 let userSequence = [];
@@ -169,6 +170,16 @@ const startGame = () => {
   headerSection.appendChild(sequenceInput);
   headerSection.appendChild(buttonsContainer);
 
+  // Event Listeners
+  repeatButton.addEventListener("click", () => {
+    userSequence = [];
+    sequenceInput.value = "";
+    repeatButton.disabled = true;
+    simulateSequence(gameSequence);
+  });
+  document.addEventListener("keydown", handleKeyPress);
+  keyboard.addEventListener("click", handleKeyClick);
+
   startRound();
 };
 
@@ -185,6 +196,7 @@ const generateSequence = (length) => {
 const simulateSequence = (sequence) => {
   const keyboard = document.getElementById("keyboard");
   let i = 0;
+  isSequencePlaying = true;
 
   const interval = setInterval(() => {
     if (i < sequence.length) {
@@ -200,8 +212,45 @@ const simulateSequence = (sequence) => {
       i++;
     } else {
       clearInterval(interval);
+      isSequencePlaying = false;
     }
   }, 400);
+};
+
+const handleKeyPress = (event) => {
+  if (isSequencePlaying) return;
+
+  const symbol = event.key.toUpperCase();
+  if (difficultyLevels[currentDifficultyLevel].includes(symbol)) {
+    fillInput(symbol);
+  }
+};
+
+const handleKeyClick = (event) => {
+  if (isSequencePlaying) return;
+
+  if (event.target.classList.contains("key")) {
+    const symbol = event.target.dataset.symbol;
+    fillInput(symbol);
+  }
+};
+
+const fillInput = (symbol) => {
+  const sequenceInput = document.getElementById("sequence");
+  userSequence.push(symbol);
+  sequenceInput.value = userSequence.join("");
+
+  if (!gameSequence.join("").startsWith(userSequence.join(""))) {
+    const message = document.createElement("div");
+    message.id = "feedback-message";
+    message.textContent = "Incorrect! Game Over!";
+    document.querySelector(".header").appendChild(message);
+  } else if (userSequence.length === gameSequence.length) {
+    const message = document.createElement("div");
+    message.id = "feedback-message";
+    message.textContent = "Correct! Proceed to the next round.";
+    document.querySelector(".header").appendChild(message);
+  }
 };
 
 const startRound = () => {
