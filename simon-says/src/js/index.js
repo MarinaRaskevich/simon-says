@@ -1,6 +1,7 @@
 // Start data
 let currentDifficultyLevel = "Easy";
 let isSequencePlaying = false;
+let isKeyBeingProcessed = false;
 let currentRound = 1;
 let gameSequence = [];
 let userSequence = [];
@@ -259,24 +260,35 @@ const simulateSequence = async (sequence) => {
 };
 
 const handleKeyPress = (event) => {
-  if (isSequencePlaying) return;
+  if (isSequencePlaying || isKeyBeingProcessed) return;
 
   const symbol = event.key.toUpperCase();
   if (difficultyLevels[currentDifficultyLevel].includes(symbol)) {
+    isKeyBeingProcessed = true;
     fillInput(symbol);
+
+    setTimeout(() => {
+      isKeyBeingProcessed = false;
+    }, 400);
   }
 };
 
 const handleKeyClick = (event) => {
-  if (isSequencePlaying) return;
+  if (isSequencePlaying || isKeyBeingProcessed) return;
   const key = event.target;
 
   if (key.classList.contains("key")) {
-    const symbol = event.target.dataset.symbol;
+    const symbol = key.dataset.symbol;
+    isKeyBeingProcessed = true;
+
     key.classList.add("highlight");
     const keySound = document.getElementById("key-sound");
     keySound.play();
-    setTimeout(() => key.classList.remove("highlight"), 400);
+    setTimeout(() => {
+      key.classList.remove("highlight");
+      isKeyBeingProcessed = false;
+    }, 400);
+
     fillInput(symbol);
   }
 };
@@ -309,6 +321,7 @@ const endGame = (success) => {
   if (!success) {
     const wrongSound = document.getElementById("wrong-sound");
     wrongSound.play();
+    isSequencePlaying = true;
   }
 };
 
