@@ -4,6 +4,7 @@ let isSequencePlaying = false;
 let currentRound = 1;
 let gameSequence = [];
 let userSequence = [];
+let attempts = 1;
 const maxRounds = 5;
 const difficultyLevels = {
   Easy: "0123456789",
@@ -153,7 +154,7 @@ const startGame = () => {
   repeatButton.id = "btn_repeat";
   repeatButton.className = "btn btn_repeat";
   repeatButton.textContent = "Repeat the sequence";
-  repeatButton.disabled = false;
+  repeatButton.disabled = true;
 
   // Create next game  button
   const nextButton = document.createElement("button");
@@ -166,6 +167,12 @@ const startGame = () => {
   newGameButton.id = "btn_new-game";
   newGameButton.className = "btn btn_new-game";
   newGameButton.textContent = "New game";
+  newGameButton.disabled = true;
+
+  //Create message container
+  const message = document.createElement("div");
+  message.id = "feedback";
+  message.className = "feedback";
 
   // Append elements
   buttonsContainer.appendChild(repeatButton);
@@ -176,11 +183,13 @@ const startGame = () => {
   headerSection.appendChild(difficultyLevel);
   headerSection.appendChild(sequenceInput);
   headerSection.appendChild(buttonsContainer);
+  headerSection.appendChild(message);
 
   // Event Listeners
   repeatButton.addEventListener("click", () => {
     const message = document.getElementById("feedback");
-    if (message) message.remove();
+    if (message) message.textContent = "";
+    attempts--;
     userSequence = [];
     sequenceInput.value = "";
     repeatButton.disabled = true;
@@ -211,6 +220,8 @@ const generateSequence = (length) => {
 
 const simulateSequence = (sequence) => {
   const keyboard = document.getElementById("keyboard");
+  const newGameButton = document.getElementById("btn_new-game");
+  const repeatButton = document.getElementById("btn_repeat");
   let i = 0;
   isSequencePlaying = true;
 
@@ -228,6 +239,8 @@ const simulateSequence = (sequence) => {
       i++;
     } else {
       clearInterval(interval);
+      newGameButton.disabled = false;
+      repeatButton.disabled = attempts == 1 ? false : true;
       isSequencePlaying = false;
     }
   }, 400);
@@ -264,15 +277,8 @@ const fillInput = (symbol) => {
 };
 
 const endGame = (success) => {
-  const message = document.createElement("div");
-  message.id = "feedback";
-  message.className = success
-    ? "feedback feedback_correct"
-    : "feedback feedback_wrong";
-  message.textContent = success
-    ? "Correct! Proceed to the next round."
-    : "Incorrect!";
-  document.querySelector(".header").appendChild(message);
+  const repeatButton = document.getElementById("btn_repeat");
+  manageMessages(success);
 
   if (success && currentRound < maxRounds) {
     const correctSound = document.getElementById("correct-sound");
@@ -286,15 +292,12 @@ const endGame = (success) => {
   if (!success) {
     const wrongSound = document.getElementById("wrong-sound");
     wrongSound.play();
-    isSequencePlaying = true;
   }
 };
 
 const startRound = () => {
   const sequenceInput = document.getElementById("sequence");
   sequenceInput.value = "";
-  const message = document.getElementById("feedback");
-  if (message) message.remove();
   const roundCounter = document.getElementById("round-counter");
   roundCounter.textContent = `Round: ${currentRound}`;
   userSequence = [];
@@ -302,6 +305,28 @@ const startRound = () => {
   gameSequence = generateSequence(sequenceLength);
   console.log(gameSequence);
   simulateSequence(gameSequence);
+};
+
+const manageMessages = (success) => {
+  const message = document.getElementById("feedback");
+  message.className = success
+    ? "feedback feedback_correct"
+    : "feedback feedback_wrong";
+  let text;
+  if (success && roundCounter < 5) {
+    text = "Correct! Proceed to the next round.";
+  }
+  if (success && roundCounter == 5) {
+    text = "Correct! You have completed all rounds!";
+  }
+  if (!success && attempts == 0) {
+    text = "Incorrect! Game over!";
+  }
+  if (!success && attempts == 1) {
+    text = "Incorrect! You can repeat the sequence.";
+  }
+
+  message.textContent = text;
 };
 
 document.addEventListener("DOMContentLoaded", () => {
