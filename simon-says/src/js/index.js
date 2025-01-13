@@ -202,6 +202,7 @@ const startGame = () => {
     repeatButton.classList.remove("hidden");
     repeatButton.disabled = false;
   });
+  newGameButton.addEventListener("click", startNewGame);
   document.addEventListener("keydown", handleKeyPress);
   keyboard.addEventListener("click", handleKeyClick);
 
@@ -313,10 +314,10 @@ const manageMessages = (success) => {
     ? "feedback feedback_correct"
     : "feedback feedback_wrong";
   let text;
-  if (success && roundCounter < 5) {
+  if (success && currentRound < maxRounds) {
     text = "Correct! Proceed to the next round.";
   }
-  if (success && roundCounter == 5) {
+  if (success && currentRound == maxRounds) {
     text = "Correct! You have completed all rounds!";
   }
   if (!success && attempts == 0) {
@@ -327,6 +328,15 @@ const manageMessages = (success) => {
   }
 
   message.textContent = text;
+};
+
+const startNewGame = () => {
+  currentRound = 1;
+  attempts = 1;
+  gameSequence = [];
+  userSequence = [];
+  document.getElementById("app").remove();
+  createInitialGameScreen();
 };
 
 document.addEventListener("DOMContentLoaded", () => {
