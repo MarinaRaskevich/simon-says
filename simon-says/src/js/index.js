@@ -15,6 +15,9 @@ const difficultyLevels = {
 
 // Create DOM elements dynamically
 const createInitialGameScreen = () => {
+  console.log(
+    "Привет! Спасибо, что нашел время проверить мою работу! К сожалению, из-за нехватки времени пострадала визуальная часть игры, а также (возможно) читабельность js кода. Я постараюсь сделать рефакторинг и добавить побольше комментариев в ближайшие дни, чтобы код был более понятным."
+  );
   // Create general div
   const app = document.createElement("div");
   app.classList.add("app");
