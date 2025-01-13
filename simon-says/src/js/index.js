@@ -155,6 +155,12 @@ const startGame = () => {
   repeatButton.textContent = "Repeat the sequence";
   repeatButton.disabled = false;
 
+  // Create next game  button
+  const nextButton = document.createElement("button");
+  nextButton.id = "btn_next";
+  nextButton.className = "btn btn_next hidden";
+  nextButton.textContent = "Next";
+
   // Create new game button
   const newGameButton = document.createElement("button");
   newGameButton.id = "btn_new-game";
@@ -163,6 +169,7 @@ const startGame = () => {
 
   // Append elements
   buttonsContainer.appendChild(repeatButton);
+  buttonsContainer.appendChild(nextButton);
   buttonsContainer.appendChild(newGameButton);
   headerSection.appendChild(header);
   headerSection.appendChild(roundCounter);
@@ -172,10 +179,19 @@ const startGame = () => {
 
   // Event Listeners
   repeatButton.addEventListener("click", () => {
+    const message = document.getElementById("feedback");
+    if (message) message.remove();
     userSequence = [];
     sequenceInput.value = "";
     repeatButton.disabled = true;
     simulateSequence(gameSequence);
+  });
+  nextButton.addEventListener("click", () => {
+    currentRound++;
+    startRound();
+    nextButton.classList.add("hidden");
+    repeatButton.classList.remove("hidden");
+    repeatButton.disabled = false;
   });
   document.addEventListener("keydown", handleKeyPress);
   keyboard.addEventListener("click", handleKeyClick);
@@ -241,22 +257,50 @@ const fillInput = (symbol) => {
   sequenceInput.value = userSequence.join("");
 
   if (!gameSequence.join("").startsWith(userSequence.join(""))) {
-    const message = document.createElement("div");
-    message.id = "feedback-message";
-    message.textContent = "Incorrect! Game Over!";
-    document.querySelector(".header").appendChild(message);
+    endGame(false);
   } else if (userSequence.length === gameSequence.length) {
-    const message = document.createElement("div");
-    message.id = "feedback-message";
-    message.textContent = "Correct! Proceed to the next round.";
-    document.querySelector(".header").appendChild(message);
+    endGame(true);
+  }
+};
+
+const endGame = (success) => {
+  const message = document.createElement("div");
+  message.id = "feedback";
+  message.className = success
+    ? "feedback feedback_correct"
+    : "feedback feedback_wrong";
+  message.textContent = success
+    ? "Correct! Proceed to the next round."
+    : "Incorrect!";
+  document.querySelector(".header").appendChild(message);
+
+  if (success && currentRound < maxRounds) {
+    const correctSound = document.getElementById("correct-sound");
+    correctSound.play();
+    const repeatButton = document.getElementById("btn_repeat");
+    const nextButton = document.getElementById("btn_next");
+    repeatButton.classList.add("hidden");
+    nextButton.classList.remove("hidden");
+  }
+
+  if (!success) {
+    const wrongSound = document.getElementById("wrong-sound");
+    wrongSound.play();
+    isSequencePlaying = true;
   }
 };
 
 const startRound = () => {
+  const sequenceInput = document.getElementById("sequence");
+  sequenceInput.value = "";
+  const message = document.getElementById("feedback");
+  if (message) message.remove();
+  const roundCounter = document.getElementById("round-counter");
+  roundCounter.textContent = `Round: ${currentRound}`;
   userSequence = [];
   const sequenceLength = 2 + (currentRound - 1) * 2;
   gameSequence = generateSequence(sequenceLength);
+  console.log(gameSequence);
   simulateSequence(gameSequence);
 };
 

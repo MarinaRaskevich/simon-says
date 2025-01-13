@@ -184,3 +184,23 @@ body {
 .sequence {
   text-align: center;
 }
+
+.feedback {
+  font-family: "Quicksand", sans-serif;
+  font-weight: bold;
+  font-size: 2em;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.feedback_correct {
+  color: rgb(4, 52, 19);
+}
+
+.feedback_wrong {
+  color: rgb(171, 18, 18);
+}
+
+.hidden {
+  display: none;
+}
