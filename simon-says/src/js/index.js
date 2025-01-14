@@ -323,6 +323,7 @@ const endGame = (success) => {
     const nextButton = document.getElementById("btn_next");
     repeatButton.classList.add("hidden");
     nextButton.classList.remove("hidden");
+    isSequencePlaying = true;
   }
 
   if (success && currentRound == maxRounds) {
