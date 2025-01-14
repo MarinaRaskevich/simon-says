@@ -216,7 +216,6 @@ const createStartGameScreen = () => {
     startRound();
     nextButton.classList.add("hidden");
     repeatButton.classList.remove("hidden");
-    repeatButton.disabled = false;
   });
 
   newGameButton.addEventListener("click", startNewGame);
@@ -261,6 +260,9 @@ const simulateSequence = async (sequence) => {
   const { attempts } = gameState;
 
   gameState.isSequencePlaying = true;
+  document.getElementById("btn_new-game").disabled = true;
+  document.getElementById("btn_repeat").disabled = true;
+
   for (const symbol of sequence) {
     const key = Array.from(keyboard.children).find(
       (k) => k.dataset.symbol === symbol
