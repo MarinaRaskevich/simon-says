@@ -269,11 +269,14 @@ const simulateSequence = async (sequence) => {
     );
     if (key) await highlightKey(key);
   }
-  gameState.isSequencePlaying = false;
 
-  document.getElementById("btn_new-game").disabled = false;
-  document.getElementById("btn_repeat").disabled =
-    attempts === 1 ? false : true;
+  setTimeout(() => {
+    gameState.isSequencePlaying = false;
+
+    document.getElementById("btn_new-game").disabled = false;
+    document.getElementById("btn_repeat").disabled =
+      attempts === 1 ? false : true;
+  }, 300);
 };
 
 // Handling keypress events on both physical and virtual keyboards
@@ -307,14 +310,14 @@ const handleKeyInteraction = (event) => {
     document.getElementById("key-sound").play();
     setTimeout(() => {
       key.classList.remove("highlight");
-    }, 400);
+    }, 100);
   }
 
   fillInput(symbol);
 
   setTimeout(() => {
     gameState.isKeyBeingProcessed = false;
-  }, 400);
+  }, 200);
 };
 
 // Filling the input with the user's pressed keys and managing the game state
