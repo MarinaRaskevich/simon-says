@@ -15,171 +15,185 @@ const difficultyLevels = {
   Hard: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
 };
 
-// Create DOM elements dynamically
+// Utility function
+const createElement = (tag, options = {}) => {
+  const element = document.createElement(tag);
+  Object.entries(options).forEach(([key, value]) => {
+    if (key === "className") {
+      element.className = value;
+    } else if (key === "dataset") {
+      Object.assign(element.dataset, value);
+    } else if (key === "textContent") {
+      element.textContent = value;
+    } else if (key === "src") {
+      element.src = value;
+    } else {
+      element[key] = value;
+    }
+  });
+  return element;
+};
+
+// Create DOM elements for initial game screen
 const createInitialGameScreen = () => {
-  // Create general div
-  const app = document.createElement("div");
-  app.classList.add("app");
-  app.id = "app";
-  // Create header section
-  const headerSection = document.createElement("div");
-  headerSection.className = "header";
-  // Create header H1
-  const header = document.createElement("h1");
-  header.classList.add("app__header");
-  header.innerHTML = "Simon Says Game";
-  headerSection.appendChild(header);
-  // Create main section
-  const mainSection = document.createElement("div");
-  mainSection.className = "main";
-  const mainWrapper = document.createElement("div");
-  mainWrapper.className = "main__wrapper wrapper";
+  // Create elements
+  const app = createElement("div", { className: "app", id: "app" });
+  const headerSection = createElement("div", { className: "header" });
+  const header = createElement("h1", {
+    className: "app__header",
+    textContent: "Simon Says Game",
+  });
+  const difficultyLevelsContainer = createElement("div", {
+    id: "levels",
+    className: "levels",
+  });
+  const difficultyLevelsHeader = createElement("p", {
+    className: "levels__header",
+    textContent: "Select level",
+  });
+  const levelsWrapper = createElement("div", { className: "levels__wrapper" });
+  Object.keys(difficultyLevels).forEach((level) => {
+    const option = createElement("div", {
+      id: level,
+      className: `level ${
+        level === gameState.currentDifficultyLevel ? "level_selected" : ""
+      }`,
+      textContent: level,
+      dataset: { level },
+    });
+    levelsWrapper.appendChild(option);
+  });
+  const startButton = createElement("button", {
+    id: "btn-start",
+    className: "btn btn_start",
+    textContent: "Start",
+  });
+  const mainSection = createElement("div", { className: "main" });
+  const mainWrapper = createElement("div", {
+    className: "main__wrapper wrapper",
+  });
+  const keyboard = createElement("ul", {
+    id: "keyboard",
+    className: "keyboard",
+  });
+
+  //Create sounds
+  const keySound = createElement("audio", {
+    id: "key-sound",
+    src: "./src/audio/key.mp3",
+  });
+
+  const wrongSound = createElement("audio", {
+    id: "wrong-sound",
+    src: "./src/audio/wrong.mp3",
+  });
+
+  const correctSound = createElement("audio", {
+    id: "correct-sound",
+    src: "./src/audio/correct.mp3",
+  });
+
+  const winnerSound = createElement("audio", {
+    id: "winner-sound",
+    src: "./src/audio/winner.mp3",
+  });
+
+  //Append elements
+  difficultyLevelsContainer.append(difficultyLevelsHeader, levelsWrapper);
+  headerSection.append(header, difficultyLevelsContainer);
+  headerSection.appendChild(startButton);
+
+  mainWrapper.append(keySound, wrongSound, correctSound, winnerSound);
+  mainWrapper.appendChild(keyboard);
   mainSection.appendChild(mainWrapper);
-  // Add elements in DOM
-  app.appendChild(headerSection);
-  app.appendChild(mainSection);
+  app.append(headerSection, mainSection);
   document.body.appendChild(app);
 
-  // Create div container for difficulty levels and its elements
-  const difficultyLevelsContainer = document.createElement("div");
-  difficultyLevelsContainer.id = "levels";
-  difficultyLevelsContainer.className = "levels";
-  const difficultyLevelsHeader = document.createElement("p");
-  difficultyLevelsHeader.className = "levels__header";
-  difficultyLevelsHeader.innerText = "Select level";
-
-  const levels = document.createElement("div");
-  levels.className = "levels__wrapper";
-  Object.keys(difficultyLevels).forEach((level) => {
-    const option = document.createElement("div");
-    option.id = level;
-    option.className = "level";
-    option.innerText = level;
-    option.setAttribute("data-level", level);
-    if (level === gameState.currentDifficultyLevel)
-      option.className = "level level_selected";
-    levels.appendChild(option);
-  });
-  difficultyLevelsContainer.appendChild(difficultyLevelsHeader);
-  difficultyLevelsContainer.appendChild(levels);
-
-  // Create Start Button
-  const startButton = document.createElement("button");
-  startButton.id = "btn-start";
-  startButton.className = "btn btn_start";
-  startButton.textContent = "Start";
-
-  // Create Keyboard
-  const keyboard = document.createElement("ul");
-  keyboard.id = "keyboard";
-  keyboard.className = "keyboard";
-
-  //Create audio
-  const keySound = document.createElement("audio");
-  keySound.src = "./src/audio/key.mp3";
-  keySound.id = "key-sound";
-
-  const wrongSound = document.createElement("audio");
-  wrongSound.src = "./src/audio/wrong.mp3";
-  wrongSound.id = "wrong-sound";
-
-  const correctSound = document.createElement("audio");
-  correctSound.src = "./src/audio/correct.mp3";
-  correctSound.id = "correct-sound";
-
-  const winnerSound = document.createElement("audio");
-  winnerSound.src = "./src/audio/winner.mp3";
-  winnerSound.id = "winner-sound";
-
-  // Append elements
-  headerSection.appendChild(difficultyLevelsContainer);
-  headerSection.appendChild(startButton);
-  mainWrapper.appendChild(keyboard);
-  mainWrapper.appendChild(keySound);
-  mainWrapper.appendChild(wrongSound);
-  mainWrapper.appendChild(correctSound);
-  mainWrapper.appendChild(winnerSound);
   updateKeyboard();
 
   // Event Listeners
-  difficultyLevelsContainer.addEventListener("click", (e) => {
-    let clickedLevel = e.target;
-    if (clickedLevel.dataset.level) {
-      document.getElementById(gameState.currentDifficultyLevel).className =
-        "level";
-      clickedLevel.className = "level level_selected";
-      gameState.currentDifficultyLevel = clickedLevel.dataset.level;
+  levelsWrapper.addEventListener("click", (e) => {
+    const clickedLevel = e.target.dataset.level;
+    if (clickedLevel) {
+      document
+        .getElementById(gameState.currentDifficultyLevel)
+        .classList.remove("level_selected");
+      e.target.classList.add("level_selected");
+      gameState.currentDifficultyLevel = clickedLevel;
       updateKeyboard();
     }
   });
-  startButton.addEventListener("click", startGame);
+
+  startButton.addEventListener("click", createStartGameScreen);
 };
 
-const startGame = () => {
+const createStartGameScreen = () => {
   const headerSection = document.querySelector(".header");
   headerSection.innerHTML = "";
 
   // Game Elements
-  // Create header H1
-  const header = document.createElement("h1");
-  header.classList.add("app__header");
-  header.innerHTML = "Simon Says Game";
+  const header = createElement("h1", {
+    className: "app__header",
+    textContent: "Simon Says Game",
+  });
 
-  // Create Round counter
-  const roundCounter = document.createElement("div");
-  roundCounter.id = "round-counter";
-  roundCounter.className = "round-counter";
-  roundCounter.textContent = `Round: ${gameState.currentRound}`;
+  const roundCounter = createElement("div", {
+    id: "round-counter",
+    className: "round-counter",
+    textContent: `Round: ${gameState.currentRound}`,
+  });
 
-  // Create difficulty level indicator
-  const difficultyLevel = document.createElement("div");
-  difficultyLevel.id = "difficulty-level";
-  difficultyLevel.className = "difficulty-level";
-  difficultyLevel.textContent = `Difficulty: ${gameState.currentDifficultyLevel}`;
+  const difficultyLevel = createElement("div", {
+    id: "difficulty-level",
+    className: "difficulty-level",
+    textContent: `Difficulty: ${gameState.currentDifficultyLevel}`,
+  });
 
-  // Create sequence input
-  const sequenceInput = document.createElement("input");
-  sequenceInput.id = "sequence";
-  sequenceInput.className = "sequence";
-  sequenceInput.readOnly = true;
+  const sequenceInput = createElement("input", {
+    id: "sequence",
+    className: "sequence",
+    readOnly: true,
+  });
 
-  // Create repeat button
-  const buttonsContainer = document.createElement("div");
-  buttonsContainer.className = "action-buttons";
-  const repeatButton = document.createElement("button");
-  repeatButton.id = "btn_repeat";
-  repeatButton.className = "btn btn_repeat";
-  repeatButton.textContent = "Repeat the sequence";
-  repeatButton.disabled = true;
+  const buttonsContainer = createElement("div", {
+    className: "action-buttons",
+  });
 
-  // Create next game  button
-  const nextButton = document.createElement("button");
-  nextButton.id = "btn_next";
-  nextButton.className = "btn btn_next hidden";
-  nextButton.textContent = "Next";
+  const repeatButton = createElement("button", {
+    id: "btn_repeat",
+    className: "btn btn_repeat",
+    textContent: "Repeat the sequence",
+    disabled: true,
+  });
 
-  // Create new game button
-  const newGameButton = document.createElement("button");
-  newGameButton.id = "btn_new-game";
-  newGameButton.className = "btn btn_new-game";
-  newGameButton.textContent = "New game";
-  newGameButton.disabled = true;
+  const nextButton = createElement("button", {
+    id: "btn_next",
+    className: "btn btn_next hidden",
+    textContent: "Next",
+  });
 
-  //Create message container
-  const message = document.createElement("div");
-  message.id = "feedback";
-  message.className = "feedback";
+  const newGameButton = createElement("button", {
+    id: "btn_new-game",
+    className: "btn btn_new-game",
+    textContent: "New game",
+    disabled: true,
+  });
+
+  const message = createElement("div", {
+    id: "feedback",
+    className: "feedback",
+  });
 
   // Append elements
-  buttonsContainer.appendChild(repeatButton);
-  buttonsContainer.appendChild(nextButton);
-  buttonsContainer.appendChild(newGameButton);
-  headerSection.appendChild(header);
-  headerSection.appendChild(roundCounter);
-  headerSection.appendChild(difficultyLevel);
-  headerSection.appendChild(sequenceInput);
-  headerSection.appendChild(buttonsContainer);
-  headerSection.appendChild(message);
+  buttonsContainer.append(repeatButton, nextButton, newGameButton);
+  headerSection.append(
+    header,
+    roundCounter,
+    difficultyLevel,
+    sequenceInput,
+    buttonsContainer,
+    message
+  );
 
   // Event Listeners
   repeatButton.addEventListener("click", () => {
@@ -191,6 +205,7 @@ const startGame = () => {
     repeatButton.disabled = true;
     simulateSequence(gameState.gameSequence);
   });
+
   nextButton.addEventListener("click", () => {
     document.querySelectorAll(".key").forEach((key) => {
       key.classList.remove("key_disabled");
@@ -203,6 +218,7 @@ const startGame = () => {
     repeatButton.classList.remove("hidden");
     repeatButton.disabled = false;
   });
+
   newGameButton.addEventListener("click", startNewGame);
   document.addEventListener("keydown", handleKeyInteraction);
   keyboard.addEventListener("click", handleKeyInteraction);
