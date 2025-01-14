@@ -185,7 +185,7 @@ const createStartGameScreen = () => {
   });
 
   // Append elements
-  buttonsContainer.append(repeatButton, nextButton, newGameButton);
+  buttonsContainer.append(newGameButton, repeatButton, nextButton);
   headerSection.append(
     header,
     roundCounter,
@@ -354,18 +354,17 @@ const endGame = (success) => {
   manageMessages(success);
   const nextButton = document.getElementById("btn_next");
   const repeatButton = document.getElementById("btn_repeat");
+  gameState.isSequencePlaying = true;
 
   if (success && gameState.currentRound < maxRounds) {
     document.getElementById("correct-sound").play();
     repeatButton.classList.add("hidden");
     nextButton.classList.remove("hidden");
-    gameState.isSequencePlaying = true;
     document.querySelectorAll(".key").forEach((key) => {
       key.classList.add("key_disabled");
     });
   } else if (!success) {
     document.getElementById("wrong-sound").play();
-    gameState.isSequencePlaying = true;
   } else {
     document.getElementById("winner-sound").play();
     repeatButton.disabled = true;
