@@ -1,5 +1,4 @@
 /* Fonts */
-
 @font-face {
   font-family: "PressStart";
   src: url("../fonts/PressStart2P-Regular.woff2") format("woff2"),
@@ -14,6 +13,7 @@
   font-weight: normal;
 }
 
+/* General Styles */
 body {
   font-size: 10px;
   background-color: cadetblue;
@@ -21,17 +21,16 @@ body {
 
 .app {
   box-sizing: border-box;
-}
-
-.app {
   padding: 5px;
   height: 95vh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
+  gap: 20px;
 }
 
+/* Header Styles */
 .header {
   display: flex;
   flex-direction: column;
@@ -39,6 +38,12 @@ body {
   justify-content: space-between;
 }
 
+.app__header {
+  font-size: 4em;
+  font-family: "PressStart", cursive;
+}
+
+/* Main Section */
 .main {
   width: 100%;
 }
@@ -50,11 +55,7 @@ body {
   padding: 10px;
 }
 
-.app__header {
-  font-size: 4em;
-  font-family: "PressStart", cursive;
-}
-
+/* Levels Section */
 .levels {
   font-size: 2em;
   display: flex;
@@ -70,9 +71,8 @@ body {
 
 .levels__wrapper {
   display: flex;
-  flex-direction: row;
-  align-items: center;
   justify-content: center;
+  align-items: center;
   gap: 10px;
 }
 
@@ -86,11 +86,12 @@ body {
   color: #f2f2f2;
 }
 
+/* Keyboard Styles */
 .keyboard {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   list-style: none;
-  flex-wrap: wrap;
   padding-left: 0;
 }
 
@@ -98,11 +99,11 @@ body {
   font-family: "Quicksand", sans-serif;
   box-shadow: 0px -6px 10px rgb(0, 0, 0), 0px 4px 15px rgba(0, 0, 0, 0.15);
   transition: 0.5s;
-  height: 2em;
+  height: 1.5em;
+  width: 2em;
   font-size: 3em;
-  width: 2.5em;
-  margin: 0.3em;
-  background-color: #000000;
+  margin: 0.2em;
+  background-color: #000;
   border-radius: 0.5em;
   display: flex;
   justify-content: flex-start;
@@ -117,24 +118,21 @@ body {
   top: 3px;
 }
 
+/* Button Styles */
 .btn {
   align-self: center;
-  border-radius: 15px 225px 255px 15px 15px 255px 225px 15px;
-  box-shadow: rgba(0, 0, 0, 0.2) 15px 28px 25px -18px;
-  box-sizing: border-box;
-  cursor: pointer;
-  display: inline-block;
-  line-height: 23px;
-  outline: none;
-  padding: 0.75rem;
-  transition: all 235ms ease-in-out;
   font-family: "PressStart", cursive;
+  padding: 0.75rem;
+  line-height: 23px;
   background-color: transparent;
   border: 2px solid black;
   border-bottom-left-radius: 15px 255px;
   border-bottom-right-radius: 225px 15px;
   border-top-left-radius: 255px 15px;
   border-top-right-radius: 15px 225px;
+  box-shadow: rgba(0, 0, 0, 0.2) 15px 28px 25px -18px;
+  transition: all 235ms ease-in-out;
+  cursor: pointer;
 }
 
 .btn:hover {
@@ -142,61 +140,47 @@ body {
   transform: translate3d(0, 2px, 0);
 }
 
-.btn:disabled:hover {
-  transform: inherit;
-  box-shadow: rgba(0, 0, 0, 0.2) 15px 28px 25px -18px;
-}
-
+.btn:disabled:hover,
 .btn:disabled:focus {
+  transform: none;
   box-shadow: rgba(0, 0, 0, 0.2) 15px 28px 25px -18px;
 }
 
 .btn_start {
-  margin-top: 20px;
-  margin-bottom: 5px;
+  margin: 20px 0 5px;
   font-size: 2em;
 }
 
+/* Game elements */
 .sequence {
   background-color: transparent;
   border: none;
   border-bottom: 1px solid black;
   font-size: 2em;
+  text-align: center;
 }
 
 .action-buttons {
-  margin-top: 15px;
   display: flex;
   gap: 6px;
+  margin-top: 15px;
 }
 
-.round-counter {
+.round-counter,
+.difficulty-level {
   font-family: "Quicksand", sans-serif;
   font-size: 2em;
 }
 
 .difficulty-level {
-  font-family: "Quicksand", sans-serif;
-  font-size: 2em;
   margin-bottom: 10px;
-}
-
-.highlight {
-  background-color: #f2f2f2;
-  color: black;
-  box-shadow: 0px -6px 10px rgb(255, 255, 255), 0px 4px 15px rgba(0, 0, 0, 0.15);
-}
-
-.sequence {
-  text-align: center;
 }
 
 .feedback {
   font-family: "Quicksand", sans-serif;
   font-weight: bold;
   font-size: 2em;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  margin: 10px 0;
 }
 
 .feedback_correct {
@@ -211,6 +195,13 @@ body {
   display: none;
 }
 
+.highlight {
+  background-color: #f2f2f2;
+  color: black;
+  box-shadow: 0px -6px 10px rgb(255, 255, 255), 0px 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Media Queries */
 @media screen and (max-width: 564px) {
   .app__header {
     font-size: 2em;
@@ -218,14 +209,14 @@ body {
 
   .key {
     height: 2em;
+    width: 2.2em;
     font-size: 2.5em;
-    width: 2.5em;
     margin: 0.2em;
     padding: 0.2em 0 0 0.2em;
   }
 
   .main__wrapper {
-    padding: 0px;
+    padding: 0;
   }
 
   .btn {
