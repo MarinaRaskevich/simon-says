@@ -1,11 +1,13 @@
 // Start data
-let currentDifficultyLevel = "Easy";
-let isSequencePlaying = false;
-let isKeyBeingProcessed = false;
-let currentRound = 1;
-let gameSequence = [];
-let userSequence = [];
-let attempts = 1;
+const gameState = {
+  currentDifficultyLevel: "Easy",
+  isSequencePlaying: false,
+  isKeyBeingProcessed: false,
+  currentRound: 1,
+  gameSequence: [],
+  userSequence: [],
+  attempts: 1,
+};
 const maxRounds = 5;
 const difficultyLevels = {
   Easy: "0123456789",
@@ -15,9 +17,6 @@ const difficultyLevels = {
 
 // Create DOM elements dynamically
 const createInitialGameScreen = () => {
-  console.log(
-    "Привет! Спасибо, что нашел время проверить мою работу! К сожалению, из-за нехватки времени пострадала визуальная часть игры, а также (возможно) читабельность js кода. Я постараюсь сделать рефакторинг и добавить побольше комментариев в ближайшие дни, чтобы код был более понятным."
-  );
   // Create general div
   const app = document.createElement("div");
   app.classList.add("app");
@@ -57,7 +56,7 @@ const createInitialGameScreen = () => {
     option.className = "level";
     option.innerText = level;
     option.setAttribute("data-level", level);
-    if (level === currentDifficultyLevel)
+    if (level === gameState.currentDifficultyLevel)
       option.className = "level level_selected";
     levels.appendChild(option);
   });
@@ -106,26 +105,14 @@ const createInitialGameScreen = () => {
   difficultyLevelsContainer.addEventListener("click", (e) => {
     let clickedLevel = e.target;
     if (clickedLevel.dataset.level) {
-      document.getElementById(currentDifficultyLevel).className = "level";
+      document.getElementById(gameState.currentDifficultyLevel).className =
+        "level";
       clickedLevel.className = "level level_selected";
-      currentDifficultyLevel = clickedLevel.dataset.level;
+      gameState.currentDifficultyLevel = clickedLevel.dataset.level;
       updateKeyboard();
     }
   });
   startButton.addEventListener("click", startGame);
-};
-
-const updateKeyboard = () => {
-  const keyboard = document.getElementById("keyboard");
-  keyboard.innerHTML = "";
-  const symbols = difficultyLevels[currentDifficultyLevel];
-  symbols.split("").forEach((symbol) => {
-    const key = document.createElement("li");
-    key.className = "key";
-    key.textContent = symbol;
-    key.dataset.symbol = symbol;
-    keyboard.appendChild(key);
-  });
 };
 
 const startGame = () => {
@@ -142,13 +129,13 @@ const startGame = () => {
   const roundCounter = document.createElement("div");
   roundCounter.id = "round-counter";
   roundCounter.className = "round-counter";
-  roundCounter.textContent = `Round: ${currentRound}`;
+  roundCounter.textContent = `Round: ${gameState.currentRound}`;
 
   // Create difficulty level indicator
   const difficultyLevel = document.createElement("div");
   difficultyLevel.id = "difficulty-level";
   difficultyLevel.className = "difficulty-level";
-  difficultyLevel.textContent = `Difficulty: ${currentDifficultyLevel}`;
+  difficultyLevel.textContent = `Difficulty: ${gameState.currentDifficultyLevel}`;
 
   // Create sequence input
   const sequenceInput = document.createElement("input");
@@ -198,15 +185,18 @@ const startGame = () => {
   repeatButton.addEventListener("click", () => {
     const message = document.getElementById("feedback");
     if (message) message.textContent = "";
-    attempts--;
-    userSequence = [];
+    gameState.attempts--;
+    gameState.userSequence = [];
     sequenceInput.value = "";
     repeatButton.disabled = true;
-    simulateSequence(gameSequence);
+    simulateSequence(gameState.gameSequence);
   });
   nextButton.addEventListener("click", () => {
-    currentRound++;
-    attempts = 1;
+    document.querySelectorAll(".key").forEach((key) => {
+      key.classList.remove("key_disabled");
+    });
+    gameState.currentRound++;
+    gameState.attempts = 1;
     message.textContent = "";
     startRound();
     nextButton.classList.add("hidden");
@@ -214,98 +204,108 @@ const startGame = () => {
     repeatButton.disabled = false;
   });
   newGameButton.addEventListener("click", startNewGame);
-  document.addEventListener("keydown", handleKeyPress);
-  keyboard.addEventListener("click", handleKeyClick);
+  document.addEventListener("keydown", handleKeyInteraction);
+  keyboard.addEventListener("click", handleKeyInteraction);
 
   startRound();
 };
 
-const generateSequence = (length) => {
-  const symbols = difficultyLevels[currentDifficultyLevel];
-  let sequence = [];
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * symbols.length);
-    sequence.push(symbols[randomIndex]);
-  }
-  return sequence;
+// Change the key set depending on the selected difficulty level
+const updateKeyboard = () => {
+  const keyboard = document.getElementById("keyboard");
+  keyboard.innerHTML = "";
+  const symbols = difficultyLevels[gameState.currentDifficultyLevel];
+  symbols.split("").forEach((symbol) => {
+    const key = document.createElement("li");
+    key.className = "key";
+    key.textContent = symbol;
+    key.dataset.symbol = symbol;
+    keyboard.appendChild(key);
+  });
 };
+
+// Key highlight control
+const highlightKey = async (key) => {
+  return new Promise((resolve) => {
+    key.classList.remove("highlight");
+    setTimeout(() => {
+      key.classList.add("highlight");
+      document.getElementById("key-sound").play();
+      setTimeout(() => {
+        key.classList.remove("highlight");
+        resolve();
+      }, 400);
+    }, 300);
+  });
+};
+
+// Start showing keys in this round
 const simulateSequence = async (sequence) => {
   const keyboard = document.getElementById("keyboard");
-  const newGameButton = document.getElementById("btn_new-game");
-  const repeatButton = document.getElementById("btn_repeat");
-  isSequencePlaying = true;
+  const { attempts } = gameState;
 
-  const highlightKey = (key) => {
-    return new Promise((resolve) => {
-      key.classList.remove("highlight");
-
-      setTimeout(() => {
-        key.classList.add("highlight");
-
-        const keySound = document.getElementById("key-sound");
-        keySound.play();
-
-        setTimeout(() => {
-          key.classList.remove("highlight");
-          resolve();
-        }, 400);
-      }, 300);
-    });
-  };
-
+  gameState.isSequencePlaying = true;
   for (const symbol of sequence) {
     const key = Array.from(keyboard.children).find(
       (k) => k.dataset.symbol === symbol
     );
-    if (key) {
-      await highlightKey(key);
-    }
+    if (key) await highlightKey(key);
   }
+  gameState.isSequencePlaying = false;
 
-  newGameButton.disabled = false;
-  repeatButton.disabled = attempts == 1 ? false : true;
-  isSequencePlaying = false;
+  document.getElementById("btn_new-game").disabled = false;
+  document.getElementById("btn_repeat").disabled =
+    attempts === 1 ? false : true;
 };
 
-const handleKeyPress = (event) => {
-  if (isSequencePlaying || isKeyBeingProcessed) return;
+// Handling keypress events on both physical and virtual keyboards
+const handleKeyInteraction = (event) => {
+  if (gameState.isSequencePlaying || gameState.isKeyBeingProcessed) return;
 
-  const symbol = event.key.toUpperCase();
-  if (difficultyLevels[currentDifficultyLevel].includes(symbol)) {
-    isKeyBeingProcessed = true;
-    fillInput(symbol);
+  let symbol;
+  let key;
 
-    setTimeout(() => {
-      isKeyBeingProcessed = false;
-    }, 100);
+  if (event.type === "keydown") {
+    symbol = event.key.toUpperCase();
+    key = Array.from(document.querySelectorAll(".key")).find(
+      (k) => k.dataset.symbol === symbol
+    );
+  } else if (event.type === "click" && event.target.classList.contains("key")) {
+    key = event.target;
+    symbol = key.dataset.symbol;
   }
-};
 
-const handleKeyClick = (event) => {
-  if (isSequencePlaying || isKeyBeingProcessed) return;
-  const key = event.target;
+  if (
+    !symbol ||
+    !difficultyLevels[gameState.currentDifficultyLevel].includes(symbol)
+  ) {
+    return;
+  }
 
-  if (key.classList.contains("key")) {
-    const symbol = key.dataset.symbol;
-    isKeyBeingProcessed = true;
+  gameState.isKeyBeingProcessed = true;
 
+  if (key) {
     key.classList.add("highlight");
-    const keySound = document.getElementById("key-sound");
-    keySound.play();
+    document.getElementById("key-sound").play();
     setTimeout(() => {
       key.classList.remove("highlight");
-      isKeyBeingProcessed = false;
     }, 400);
-
-    fillInput(symbol);
   }
+
+  fillInput(symbol);
+
+  setTimeout(() => {
+    gameState.isKeyBeingProcessed = false;
+  }, 400);
 };
 
+// Filling the input with the user's pressed keys and managing the game state
 const fillInput = (symbol) => {
   const sequenceInput = document.getElementById("sequence");
-  userSequence.push(symbol);
-  sequenceInput.value = userSequence.join("");
+  gameState.userSequence.push(symbol);
+  sequenceInput.value = gameState.userSequence.join("");
 
+  const { userSequence, gameSequence } = gameState;
   if (!gameSequence.join("").startsWith(userSequence.join(""))) {
     endGame(false);
   } else if (userSequence.length === gameSequence.length) {
@@ -313,76 +313,87 @@ const fillInput = (symbol) => {
   }
 };
 
+// Choosing the right feedback depending on the state of the game
+const manageMessages = (success) => {
+  const message = document.getElementById("feedback");
+  const { currentRound, attempts } = gameState;
+
+  message.className = success
+    ? "feedback feedback_correct"
+    : "feedback feedback_wrong";
+
+  message.textContent = success
+    ? currentRound < maxRounds
+      ? "Correct! Proceed to the next round."
+      : "Correct! You have completed all rounds!"
+    : attempts === 0
+    ? "Incorrect! Game over!"
+    : "Incorrect! You can repeat the sequence.";
+};
+
+// Controlling the end of each round
 const endGame = (success) => {
   manageMessages(success);
+  const nextButton = document.getElementById("btn_next");
+  const repeatButton = document.getElementById("btn_repeat");
 
-  if (success && currentRound < maxRounds) {
-    const correctSound = document.getElementById("correct-sound");
-    correctSound.play();
-    const repeatButton = document.getElementById("btn_repeat");
-    const nextButton = document.getElementById("btn_next");
+  if (success && gameState.currentRound < maxRounds) {
+    document.getElementById("correct-sound").play();
     repeatButton.classList.add("hidden");
     nextButton.classList.remove("hidden");
-    isSequencePlaying = true;
-  }
-
-  if (success && currentRound == maxRounds) {
-    const winnerSound = document.getElementById("winner-sound");
-    winnerSound.play();
-    const repeatButton = document.getElementById("btn_repeat");
+    gameState.isSequencePlaying = true;
+    document.querySelectorAll(".key").forEach((key) => {
+      key.classList.add("key_disabled");
+    });
+  } else if (!success) {
+    document.getElementById("wrong-sound").play();
+    gameState.isSequencePlaying = true;
+  } else {
+    document.getElementById("winner-sound").play();
     repeatButton.disabled = true;
-  }
-
-  if (!success) {
-    const wrongSound = document.getElementById("wrong-sound");
-    wrongSound.play();
-    isSequencePlaying = true;
   }
 };
 
+// Generate a sequence of random numbers for a new round
+const generateSequence = (length) => {
+  gameState.gameSequence = Array.from(
+    { length },
+    () =>
+      difficultyLevels[gameState.currentDifficultyLevel][
+        Math.floor(
+          Math.random() *
+            difficultyLevels[gameState.currentDifficultyLevel].length
+        )
+      ]
+  );
+  return gameState.gameSequence;
+};
+
+// Reset elements and start generating and displaying new keys
 const startRound = () => {
-  const sequenceInput = document.getElementById("sequence");
-  sequenceInput.value = "";
-  const roundCounter = document.getElementById("round-counter");
-  roundCounter.textContent = `Round: ${currentRound}`;
-  userSequence = [];
+  const { currentRound } = gameState;
+  gameState.userSequence = [];
+  document.getElementById("sequence").value = "";
+  document.getElementById(
+    "round-counter"
+  ).textContent = `Round: ${currentRound}`;
+
   const sequenceLength = 2 + (currentRound - 1) * 2;
-  gameSequence = generateSequence(sequenceLength);
+  let gameSequence = generateSequence(sequenceLength);
   console.log(gameSequence);
   simulateSequence(gameSequence);
 };
 
-const manageMessages = (success) => {
-  const message = document.getElementById("feedback");
-  message.className = success
-    ? "feedback feedback_correct"
-    : "feedback feedback_wrong";
-  let text;
-  if (success && currentRound < maxRounds) {
-    text = "Correct! Proceed to the next round.";
-  }
-  if (success && currentRound == maxRounds) {
-    text = "Correct! You have completed all rounds!";
-  }
-  if (!success && attempts == 0) {
-    text = "Incorrect! Game over!";
-  }
-  if (!success && attempts == 1) {
-    text = "Incorrect! You can repeat the sequence.";
-  }
-
-  message.textContent = text;
-};
-
+// Launch a new game after clicking the New Game button
 const startNewGame = () => {
-  currentRound = 1;
-  attempts = 1;
-  gameSequence = [];
-  userSequence = [];
+  Object.assign(gameState, {
+    currentRound: 1,
+    attempts: 1,
+    gameSequence: [],
+    userSequence: [],
+  });
   document.getElementById("app").remove();
   createInitialGameScreen();
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-  createInitialGameScreen();
-});
+document.addEventListener("DOMContentLoaded", createInitialGameScreen);
