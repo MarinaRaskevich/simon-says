@@ -129,7 +129,7 @@ const createInitialGameScreen = () => {
 
 const createStartGameScreen = () => {
   const headerSection = document.querySelector(".header");
-  headerSection.innerHTML = "";
+  headerSection.textContent = "";
 
   // Game Elements
   const header = createElement("h1", {
@@ -228,7 +228,7 @@ const createStartGameScreen = () => {
 // Change the key set depending on the selected difficulty level
 const updateKeyboard = () => {
   const keyboard = document.getElementById("keyboard");
-  keyboard.innerHTML = "";
+  keyboard.textContent = "";
   const symbols = difficultyLevels[gameState.currentDifficultyLevel];
   symbols.split("").forEach((symbol) => {
     const key = document.createElement("li");
