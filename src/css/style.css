@@ -1,0 +1,237 @@
+/* Fonts */
+@font-face {
+  font-family: "PressStart";
+  src: url("../fonts/PressStart2P-Regular.woff2") format("woff2"),
+    url("../fonts/PressStart2P-Regular.woff") format("woff");
+  font-weight: normal;
+}
+
+@font-face {
+  font-family: "Quicksand";
+  src: url("../fonts/Quicksand-Regular.woff2") format("woff2"),
+    url("../fonts/Quicksand-Regular.woff") format("woff");
+  font-weight: normal;
+}
+
+/* General Styles */
+body {
+  font-size: 10px;
+  background-color: cadetblue;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.app {
+  box-sizing: border-box;
+  padding: 5px 10px 5px 10px;
+  max-width: 1200px;
+  height: 95vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+/* Header Styles */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.app__header {
+  font-size: 4em;
+  font-family: "PressStart", cursive;
+}
+
+/* Main Section */
+.main {
+  width: 100%;
+}
+
+.main__wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+}
+
+/* Levels Section */
+.levels {
+  font-size: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.levels__header {
+  font-weight: bold;
+  font-family: "Quicksand", sans-serif;
+  margin-bottom: 0;
+}
+
+.levels__wrapper {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+}
+
+.level {
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+}
+
+.level_selected {
+  font-size: 1.5em;
+  color: #f2f2f2;
+}
+
+/* Keyboard Styles */
+.keyboard {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  list-style: none;
+  padding-left: 0;
+}
+
+.key {
+  font-family: "Quicksand", sans-serif;
+  box-shadow: 0px -6px 10px rgb(0, 0, 0), 0px 4px 15px rgba(0, 0, 0, 0.15);
+  transition: 0.5s;
+  height: 1.5em;
+  width: 2em;
+  font-size: 3em;
+  margin: 0.2em;
+  background-color: #000;
+  border-radius: 0.5em;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding: 0.3em 0 0 0.3em;
+  color: #f2f2f2;
+}
+
+.key:hover {
+  box-shadow: 0 2px 0 rgba(0, 0, 0, 0.15);
+  cursor: pointer;
+  top: 3px;
+}
+
+.key_disabled {
+  color: #f2f2f2;
+  background-color: black;
+  pointer-events: none;
+}
+
+/* Button Styles */
+.btn {
+  align-self: center;
+  font-family: "PressStart", cursive;
+  padding: 0.75rem;
+  line-height: 23px;
+  background-color: transparent;
+  border: 2px solid black;
+  border-bottom-left-radius: 15px 255px;
+  border-bottom-right-radius: 225px 15px;
+  border-top-left-radius: 255px 15px;
+  border-top-right-radius: 15px 225px;
+  box-shadow: rgba(0, 0, 0, 0.2) 15px 28px 25px -18px;
+  transition: all 235ms ease-in-out;
+  cursor: pointer;
+}
+
+.btn:hover {
+  box-shadow: rgba(0, 0, 0, 0.3) 2px 8px 8px -5px;
+  transform: translate3d(0, 2px, 0);
+}
+
+.btn:disabled:hover,
+.btn:disabled:focus {
+  transform: none;
+  box-shadow: rgba(0, 0, 0, 0.2) 15px 28px 25px -18px;
+}
+
+.btn_start {
+  margin: 20px 0 5px;
+  font-size: 2em;
+}
+
+/* Game elements */
+.sequence {
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid black;
+  font-size: 2em;
+  text-align: center;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 6px;
+  margin-top: 15px;
+}
+
+.round-counter,
+.difficulty-level {
+  font-family: "Quicksand", sans-serif;
+  font-size: 2em;
+}
+
+.difficulty-level {
+  margin-bottom: 10px;
+}
+
+.feedback {
+  font-family: "Quicksand", sans-serif;
+  font-weight: bold;
+  font-size: 2em;
+  margin: 10px 0;
+  text-align: center;
+}
+
+.feedback_correct {
+  color: rgb(4, 52, 19);
+}
+
+.feedback_wrong {
+  color: rgb(171, 18, 18);
+}
+
+.hidden {
+  display: none;
+}
+
+.highlight {
+  background-color: #f2f2f2;
+  color: black;
+  box-shadow: 0px -6px 10px rgb(255, 255, 255), 0px 4px 15px rgba(0, 0, 0, 0.15);
+}
+
+/* Media Queries */
+@media screen and (max-width: 564px) {
+  .app__header {
+    font-size: 2em;
+  }
+
+  .key {
+    height: 2em;
+    width: 2.2em;
+    font-size: 2.5em;
+    margin: 0.2em;
+    padding: 0.2em 0 0 0.2em;
+  }
+
+  .main__wrapper {
+    padding: 0;
+  }
+
+  .btn {
+    font-size: 1em;
+  }
+}
